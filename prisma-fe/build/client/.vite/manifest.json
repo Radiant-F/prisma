@@ -1,0 +1,54 @@
+{
+  "_chunk-EPOLDU6W-D05svEr6.js": {
+    "file": "assets/chunk-EPOLDU6W-D05svEr6.js",
+    "name": "chunk-EPOLDU6W"
+  },
+  "src/entry.client.tsx": {
+    "file": "assets/entry.client-DOnHSdSV.js",
+    "name": "entry.client",
+    "src": "src/entry.client.tsx",
+    "isEntry": true,
+    "imports": [
+      "_chunk-EPOLDU6W-D05svEr6.js"
+    ]
+  },
+  "src/pages/auth/index.tsx?__react-router-build-client-route": {
+    "file": "assets/index-DWuqXKYg.js",
+    "name": "index",
+    "src": "src/pages/auth/index.tsx?__react-router-build-client-route",
+    "isEntry": true,
+    "imports": [
+      "_chunk-EPOLDU6W-D05svEr6.js"
+    ]
+  },
+  "src/pages/home/index.tsx?__react-router-build-client-route": {
+    "file": "assets/index-CYj0bycv.js",
+    "name": "index",
+    "src": "src/pages/home/index.tsx?__react-router-build-client-route",
+    "isEntry": true,
+    "imports": [
+      "_chunk-EPOLDU6W-D05svEr6.js"
+    ]
+  },
+  "src/pages/root/index.tsx?__react-router-build-client-route": {
+    "file": "assets/index-CPFLG-Ex.js",
+    "name": "index",
+    "src": "src/pages/root/index.tsx?__react-router-build-client-route",
+    "isEntry": true,
+    "imports": [
+      "_chunk-EPOLDU6W-D05svEr6.js"
+    ]
+  },
+  "src/root.tsx?__react-router-build-client-route": {
+    "file": "assets/root-y7xBqv4d.js",
+    "name": "root",
+    "src": "src/root.tsx?__react-router-build-client-route",
+    "isEntry": true,
+    "imports": [
+      "_chunk-EPOLDU6W-D05svEr6.js"
+    ],
+    "css": [
+      "assets/root-DNod9-02.css"
+    ]
+  }
+}
