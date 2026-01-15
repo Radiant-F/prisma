@@ -95,6 +95,7 @@ DATABASE & MIGRATIONS
     - id
     - username (unique)
     - password_hash
+    - token_version (integer, default 0, for global invalidation)
     - created_at
     - updated_at
 - Use migrations (Drizzle migration tooling)
@@ -115,8 +116,17 @@ AUTHENTICATION MODEL (HYBRID)
 - Implement:
   - signup
   - signin
+    - Generate tokens containing current `token_version` from DB
   - token refresh
+    - Verify token version matches DB version
   - logout
+    - Increment user's `token_version` in DB to invalidate ALL existing tokens
+- Authorization Strategy:
+
+  - Verify JWT signature
+  - Verify JWT `token_version` claim matches the user's current version in DB
+  - If version mismatch -> 401 Unauthorized (Token Revoked)
+
 - Only authenticated users may:
   - update their own profile
   - delete their own account
@@ -157,6 +167,7 @@ API DOCUMENTATION REQUIREMENTS
 ────────────────────────────────────
 
 - Use @elysiajs/openapi
+- Use /docs as the route path to access the documentations
 - Every route MUST include:
   - description
   - request body schema
@@ -175,10 +186,12 @@ TESTING REQUIREMENTS
 - Tests should:
   - call `app.handle(new Request(...))`
   - not require a running server
-- Test at least:
-  - signup success & failure
-  - signin success & failure
-  - protected route access control
+- Test ALL implemented features and endpoints, including:
+  - signup success & failure (validation, duplicates)
+  - signin success & failure (wrong creds)
+  - protected route access control (unauthorized, invalid token, revoked token)
+  - token refresh flow
+  - user profile CRUD (get, update, delete)
 
 ────────────────────────────────────
 LINTING & TYPE SAFETY
@@ -186,6 +199,7 @@ LINTING & TYPE SAFETY
 
 - Configure ESLint for TypeScript
 - Run type checking after implementing each feature
+- REQUIRED: Run a final `bun lint && bun typecheck` validation after ALL scaffolding is complete to ensure zero errors
 - Code must be:
   - strict
   - typed
