@@ -1,7 +1,8 @@
-import { Elysia } from "elysia";
+/**
+ * App composition and type export
+ * This file is used for type inference with Eden Treaty
+ */
+import app from "./app";
 
-const app = new Elysia().get("/", () => "Hello Elysia").listen(3000);
-
-console.log(
-  `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
-);
+export type App = typeof app;
+export { app };
