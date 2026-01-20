@@ -17,10 +17,25 @@ export const errorHandler = new Elysia({ name: "errorHandler" }).onError(
       };
     }
 
+    const errorData = error as { name?: string; code?: string; type?: string };
+
+    // Handle Elysia validation error objects (code/type)
+    if (errorData?.code === "VALIDATION" || errorData?.type === "validation") {
+      set.status = 422;
+      return {
+        message: "Validation failed",
+        code: "VALIDATION_ERROR",
+      };
+    }
+
     // Handle Elysia validation errors and other Error types
     if (error instanceof Error) {
-      if (error.name === "ValidationError") {
-        set.status = 400;
+      if (
+        error.name === "ValidationError" ||
+        errorData?.code === "VALIDATION" ||
+        errorData?.type === "validation"
+      ) {
+        set.status = 422;
         return {
           message: "Validation failed",
           code: "VALIDATION_ERROR",

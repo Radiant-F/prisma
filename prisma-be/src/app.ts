@@ -4,6 +4,7 @@ import { openapi } from "@elysiajs/openapi";
 import { errorHandler } from "./plugins/error-handler";
 import { authRoutes } from "./modules/auth/auth.routes";
 import { userRoutes } from "./modules/user/user.routes";
+import { todoRoutes } from "./modules/todo/todo.routes";
 
 /**
  * Main application composition
@@ -23,6 +24,7 @@ const app = new Elysia()
         tags: [
           { name: "Auth", description: "Authentication endpoints" },
           { name: "Users", description: "User management endpoints" },
+          { name: "Todos", description: "Todo management endpoints" },
         ],
         components: {
           securitySchemes: {
@@ -50,7 +52,8 @@ const app = new Elysia()
   }))
   .get("/health", () => ({ status: "ok", timestamp: new Date().toISOString() }))
   .use(authRoutes)
-  .use(userRoutes);
+  .use(userRoutes)
+  .use(todoRoutes);
 
 export type App = typeof app;
 export default app;
