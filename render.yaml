@@ -1,0 +1,52 @@
+services:
+  - type: web
+    name: prisma-be
+    env: node
+    plan: free
+    rootDir: prisma-be
+    buildCommand: |
+      curl -fsSL https://bun.sh/install | bash
+      export BUN_INSTALL="$HOME/.bun"
+      export PATH="$BUN_INSTALL/bin:$PATH"
+      bun install --frozen-lockfile
+      bun run build
+    startCommand: |
+      export BUN_INSTALL="$HOME/.bun"
+      export PATH="$BUN_INSTALL/bin:$PATH"
+      bun run db:migrate
+      bun run start
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: prisma-db
+          property: connectionString
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: ACCESS_TOKEN_EXPIRES_IN
+        value: 15m
+      - key: REFRESH_TOKEN_EXPIRES_IN
+        value: 7d
+
+  - type: static
+    name: prisma-fe
+    plan: free
+    rootDir: prisma-fe
+    buildCommand: |
+      npm install
+      npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_BASE_URL
+        value: https://prisma-be.onrender.com
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
+databases:
+  - name: prisma-db
+    plan: free
+    postgresMajorVersion: 14
