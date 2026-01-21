@@ -10,6 +10,9 @@ import type { Route } from "./+types/root";
 import "./index.css";
 import { Provider } from "react-redux";
 import { store } from "./redux/store";
+import { AuthBootstrap } from "./features/auth";
+import { I18nProvider } from "./i18n";
+import { ThemeProvider } from "./theme";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -21,7 +24,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        <Provider store={store}>{children}</Provider>
+        <Provider store={store}>
+          <ThemeProvider>
+            <I18nProvider>
+              <AuthBootstrap />
+              {children}
+            </I18nProvider>
+          </ThemeProvider>
+        </Provider>
         <ScrollRestoration />
         <Scripts />
       </body>
@@ -50,7 +60,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   }
 
   return (
-    <main className="pt-16 p-4 container mx-auto text-white bg-slate-900 min-h-screen">
+    <main className="pt-16 p-4 container mx-auto theme-page min-h-screen">
       <h1 className="text-3xl font-bold mb-4">{message}</h1>
       <p className="text-lg mb-4">{details}</p>
       {stack && (

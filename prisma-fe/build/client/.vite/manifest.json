@@ -3,6 +3,27 @@
     "file": "assets/chunk-EPOLDU6W-D05svEr6.js",
     "name": "chunk-EPOLDU6W"
   },
+  "_index-DF_W_b-C.js": {
+    "file": "assets/index-DF_W_b-C.js",
+    "name": "index",
+    "imports": [
+      "_chunk-EPOLDU6W-D05svEr6.js"
+    ]
+  },
+  "_index-DQimSAlW.js": {
+    "file": "assets/index-DQimSAlW.js",
+    "name": "index",
+    "imports": [
+      "_chunk-EPOLDU6W-D05svEr6.js"
+    ]
+  },
+  "_todoState-OMMJvn6A.js": {
+    "file": "assets/todoState-OMMJvn6A.js",
+    "name": "todoState",
+    "imports": [
+      "_index-DQimSAlW.js"
+    ]
+  },
   "src/entry.client.tsx": {
     "file": "assets/entry.client-DOnHSdSV.js",
     "name": "entry.client",
@@ -13,42 +34,49 @@
     ]
   },
   "src/pages/auth/index.tsx?__react-router-build-client-route": {
-    "file": "assets/index-DWuqXKYg.js",
+    "file": "assets/index-C0JjMir1.js",
     "name": "index",
     "src": "src/pages/auth/index.tsx?__react-router-build-client-route",
     "isEntry": true,
     "imports": [
-      "_chunk-EPOLDU6W-D05svEr6.js"
+      "_chunk-EPOLDU6W-D05svEr6.js",
+      "_index-DQimSAlW.js"
     ]
   },
   "src/pages/home/index.tsx?__react-router-build-client-route": {
-    "file": "assets/index-CYj0bycv.js",
+    "file": "assets/index-A06JVZH3.js",
     "name": "index",
     "src": "src/pages/home/index.tsx?__react-router-build-client-route",
     "isEntry": true,
     "imports": [
-      "_chunk-EPOLDU6W-D05svEr6.js"
+      "_chunk-EPOLDU6W-D05svEr6.js",
+      "_index-DQimSAlW.js",
+      "_todoState-OMMJvn6A.js",
+      "_index-DF_W_b-C.js"
     ]
   },
   "src/pages/root/index.tsx?__react-router-build-client-route": {
-    "file": "assets/index-CPFLG-Ex.js",
+    "file": "assets/index-C1z150zG.js",
     "name": "index",
     "src": "src/pages/root/index.tsx?__react-router-build-client-route",
     "isEntry": true,
     "imports": [
-      "_chunk-EPOLDU6W-D05svEr6.js"
+      "_chunk-EPOLDU6W-D05svEr6.js",
+      "_index-DF_W_b-C.js"
     ]
   },
   "src/root.tsx?__react-router-build-client-route": {
-    "file": "assets/root-y7xBqv4d.js",
+    "file": "assets/root-Cv8_VqGr.js",
     "name": "root",
     "src": "src/root.tsx?__react-router-build-client-route",
     "isEntry": true,
     "imports": [
-      "_chunk-EPOLDU6W-D05svEr6.js"
+      "_chunk-EPOLDU6W-D05svEr6.js",
+      "_index-DQimSAlW.js",
+      "_todoState-OMMJvn6A.js"
     ],
     "css": [
-      "assets/root-DNod9-02.css"
+      "assets/root-15QbMt65.css"
     ]
   }
 }

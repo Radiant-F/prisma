@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
+import { useAppSelector } from "@/hooks";
 import {
   TodoHeader,
   TodoSidebar,
@@ -8,13 +10,21 @@ import {
 
 export default function Home() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const navigate = useNavigate();
+  const { isAuthenticated, isReady } = useAppSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (isReady && !isAuthenticated) {
+      navigate("/auth");
+    }
+  }, [isAuthenticated, isReady, navigate]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-950 to-indigo-950 text-white font-sans overflow-hidden flex">
+    <div className="min-h-screen theme-page font-sans overflow-hidden flex">
       {/* Background Blobs (Fixed) */}
       <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[40rem] h-[40rem] bg-purple-600/10 rounded-full mix-blend-screen filter blur-3xl opacity-20 animate-blob" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[35rem] h-[35rem] bg-indigo-500/10 rounded-full mix-blend-screen filter blur-3xl opacity-20 animate-blob animation-delay-2000" />
+        <div className="absolute top-[-10%] left-[-10%] w-[40rem] h-[40rem] rounded-full mix-blend-screen filter blur-3xl opacity-20 animate-blob bg-[var(--blob-1)]" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[35rem] h-[35rem] rounded-full mix-blend-screen filter blur-3xl opacity-20 animate-blob animation-delay-2000 bg-[var(--blob-2)]" />
       </div>
 
       {/* Mobile Overlay */}
