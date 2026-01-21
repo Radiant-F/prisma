@@ -32,7 +32,6 @@ services:
   - type: web
     name: prisma-fe
     runtime: static
-    plan: free
     rootDir: prisma-fe
     buildCommand: |
       npm install
