@@ -30,14 +30,14 @@ services:
       - key: REFRESH_TOKEN_EXPIRES_IN
         value: 7d
 
-  - type: static
+  - type: static_site
     name: prisma-fe
     plan: free
     rootDir: prisma-fe
     buildCommand: |
       npm install
       npm run build
-    staticPublishPath: dist
+    staticPublishPath: build/client
     envVars:
       - key: VITE_API_BASE_URL
         value: https://prisma-be.onrender.com
