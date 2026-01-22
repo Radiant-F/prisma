@@ -36,7 +36,7 @@ services:
     buildCommand: |
       npm install
       npm run build
-    staticPublishPath: build/client
+    staticPublishPath: dist
     envVars:
       - key: VITE_API_BASE_URL
         value: https://prisma-be.onrender.com
@@ -48,4 +48,3 @@ services:
 databases:
   - name: prisma-db
     plan: free
-    postgresMajorVersion: 14
