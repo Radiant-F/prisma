@@ -31,19 +31,17 @@ services:
         value: 7d
   - type: web
     name: prisma-fe
-    runtime: static
+    env: node
+    plan: free
     rootDir: prisma-fe
     buildCommand: |
       npm install
       npm run build
-    staticPublishPath: build/client
+    startCommand: |
+      npm run start
     envVars:
       - key: VITE_API_BASE_URL
         value: https://prisma-be.onrender.com
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
 
 databases:
   - name: prisma-db
