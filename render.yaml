@@ -36,7 +36,7 @@ services:
     buildCommand: |
       npm install
       npm run build
-    staticPublishPath: dist
+    staticPublishPath: build/client
     envVars:
       - key: VITE_API_BASE_URL
         value: https://prisma-be.onrender.com
