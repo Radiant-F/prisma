@@ -5,6 +5,7 @@ import {
   useCreateTodoMutation,
   useListTagsQuery,
 } from "../services/todoApiSlice";
+import { useI18n } from "@/i18n";
 
 interface TodoComposerFormValues {
   title: string;
@@ -14,6 +15,7 @@ interface TodoComposerFormValues {
 }
 
 export const TodoComposer = () => {
+  const { t } = useI18n();
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [showTags, setShowTags] = useState(false);
   const [subtasks, setSubtasks] = useState<
@@ -98,10 +100,10 @@ export const TodoComposer = () => {
           <input
             type="text"
             {...register("title", {
-              required: "Title is required.",
-              minLength: { value: 1, message: "Title is required." },
+              required: t("todoTitleRequired"),
+              minLength: { value: 1, message: t("todoTitleRequired") },
             })}
-            placeholder="Add a new task..."
+            placeholder={t("todoTitlePlaceholder")}
             className="bg-transparent border-none outline-none text-[var(--text-primary)] theme-placeholder w-full text-base py-2"
           />
         </div>
@@ -116,10 +118,10 @@ export const TodoComposer = () => {
             {...register("description", {
               maxLength: {
                 value: 5000,
-                message: "Description is too long.",
+                message: t("todoDescriptionTooLong"),
               },
             })}
-            placeholder="Add description (optional)"
+            placeholder={t("todoDescriptionPlaceholder")}
             className="w-full min-h-[72px] bg-transparent border rounded-xl px-3 py-2 text-sm outline-none theme-input theme-placeholder"
           />
           {errors.description && (
@@ -133,7 +135,7 @@ export const TodoComposer = () => {
           <div className="flex flex-wrap items-center gap-2">
             <label className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium theme-muted hover:text-[var(--text-primary)] hover:bg-[var(--ghost-hover)] transition-colors cursor-pointer">
               <MdCalendarToday size={14} />
-              <span>Due</span>
+              <span>{t("todoDueLabel")}</span>
               <input
                 type="date"
                 {...register("dueDate")}
@@ -146,10 +148,10 @@ export const TodoComposer = () => {
               className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium theme-muted hover:text-[var(--text-primary)] hover:bg-[var(--ghost-hover)] transition-colors"
             >
               <MdLabelOutline size={14} />
-              <span>Tags</span>
+              <span>{t("todoTagsLabel")}</span>
             </button>
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium theme-muted bg-[var(--ghost-bg)]">
-              <span>Priority</span>
+              <span>{t("todoPriorityLabel")}</span>
               <select
                 {...register("importance", { valueAsNumber: true })}
                 className="bg-transparent text-[var(--text-primary)] text-xs outline-none"
@@ -167,7 +169,9 @@ export const TodoComposer = () => {
             disabled={createState.isLoading || isSubmitting}
             className="px-4 py-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold rounded-lg transition-all shadow-lg shadow-purple-500/20 disabled:opacity-70"
           >
-            {createState.isLoading || isSubmitting ? "Adding..." : "Add Task"}
+            {createState.isLoading || isSubmitting
+              ? t("todoAdding")
+              : t("todoAddTask")}
           </button>
         </div>
 
@@ -188,13 +192,13 @@ export const TodoComposer = () => {
               </button>
             ))}
             {!tags.length && (
-              <span className="text-xs theme-subtle">No tags yet.</span>
+              <span className="text-xs theme-subtle">{t("todoNoTags")}</span>
             )}
           </div>
         )}
 
         <div className="px-4 pb-4 pt-2 border-t theme-divider">
-          <p className="text-xs theme-muted mb-2">Subtasks</p>
+          <p className="text-xs theme-muted mb-2">{t("todoSubtasksLabel")}</p>
           <div className="space-y-2">
             {subtasks.map((task) => (
               <div
@@ -219,7 +223,7 @@ export const TodoComposer = () => {
                   onClick={() => handleRemoveSubtask(task.id)}
                   className="text-xs text-rose-500 hover:text-rose-600"
                 >
-                  Remove
+                  {t("todoRemove")}
                 </button>
               </div>
             ))}
@@ -227,7 +231,7 @@ export const TodoComposer = () => {
               <input
                 value={newSubtask}
                 onChange={(event) => setNewSubtask(event.target.value)}
-                placeholder="New subtask"
+                placeholder={t("todoNewSubtaskPlaceholder")}
                 className="flex-1 px-3 py-2 rounded-lg border text-sm outline-none theme-input theme-placeholder"
               />
               <button
@@ -235,7 +239,7 @@ export const TodoComposer = () => {
                 onClick={handleAddSubtask}
                 className="px-3 py-2 rounded-lg bg-[var(--ghost-bg)] hover:bg-[var(--ghost-hover)] text-xs text-[var(--text-primary)]"
               >
-                Add
+                {t("todoAdd")}
               </button>
             </div>
           </div>

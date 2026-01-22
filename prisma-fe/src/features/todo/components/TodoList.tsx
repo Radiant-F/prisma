@@ -10,6 +10,7 @@ import { setPage } from "../services/todoState";
 import type { Todo } from "../todo";
 import { TodoItem } from "./TodoItem";
 import { useForm } from "react-hook-form";
+import { useI18n } from "@/i18n";
 
 interface TodoEditFormValues {
   title: string;
@@ -19,6 +20,7 @@ interface TodoEditFormValues {
 }
 
 export const TodoList = () => {
+  const { t } = useI18n();
   const dispatch = useAppDispatch();
   const filters = useAppSelector((state) => state.todoFilters);
   const [updateTodo] = useUpdateTodoMutation();
@@ -179,13 +181,11 @@ export const TodoList = () => {
   return (
     <div className="space-y-4 pb-20">
       {isLoading && (
-        <div className="text-sm theme-muted px-1">Loading tasks...</div>
+        <div className="text-sm theme-muted px-1">{t("todoLoading")}</div>
       )}
 
       {!isLoading && data?.items.length === 0 && (
-        <div className="text-sm theme-subtle px-1">
-          No tasks yet. Add your first one above.
-        </div>
+        <div className="text-sm theme-subtle px-1">{t("todoEmpty")}</div>
       )}
 
       <div className="space-y-3">
@@ -210,7 +210,7 @@ export const TodoList = () => {
           >
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-[var(--text-primary)]">
-                Edit task
+                {t("todoEditTaskTitle")}
               </h3>
               <button
                 onClick={closeEditor}
@@ -224,11 +224,11 @@ export const TodoList = () => {
             <div className="space-y-4">
               <input
                 {...register("title", {
-                  required: "Title is required.",
-                  minLength: { value: 1, message: "Title is required." },
+                  required: t("todoTitleRequired"),
+                  minLength: { value: 1, message: t("todoTitleRequired") },
                 })}
                 className="w-full px-4 py-3 rounded-xl border outline-none theme-input"
-                placeholder="Task title"
+                placeholder={t("todoTaskTitlePlaceholder")}
               />
               {errors.title && (
                 <p className="text-xs text-rose-300">{errors.title.message}</p>
@@ -237,15 +237,15 @@ export const TodoList = () => {
                 {...register("description", {
                   maxLength: {
                     value: 5000,
-                    message: "Description is too long.",
+                    message: t("todoDescriptionTooLong"),
                   },
                 })}
                 className="w-full px-4 py-3 rounded-xl border outline-none min-h-[100px] theme-input"
-                placeholder="Description"
+                placeholder={t("todoDescriptionLabel")}
               />
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <label className="text-xs theme-muted">
-                  Due date
+                  {t("todoDueDateLabel")}
                   <input
                     type="date"
                     {...register("dueDate")}
@@ -253,7 +253,7 @@ export const TodoList = () => {
                   />
                 </label>
                 <label className="text-xs theme-muted">
-                  Priority
+                  {t("todoPriorityLabel")}
                   <select
                     {...register("importance", { valueAsNumber: true })}
                     className="mt-1 w-full px-3 py-2 rounded-lg border theme-input"
@@ -272,7 +272,7 @@ export const TodoList = () => {
               </div>
 
               <div>
-                <p className="text-xs theme-muted mb-2">Tags</p>
+                <p className="text-xs theme-muted mb-2">{t("todoTagsLabel")}</p>
                 <div className="flex flex-wrap gap-2">
                   {(tagsData?.items ?? []).map((tag) => (
                     <button
@@ -298,7 +298,9 @@ export const TodoList = () => {
               </div>
 
               <div>
-                <p className="text-xs theme-muted mb-2">Subtasks</p>
+                <p className="text-xs theme-muted mb-2">
+                  {t("todoSubtasksLabel")}
+                </p>
                 <div className="space-y-2">
                   {editSubtasks.map((task) => (
                     <div
@@ -334,7 +336,7 @@ export const TodoList = () => {
                         onClick={() => handleDeleteSubtask(task.id)}
                         className="text-xs text-rose-500 hover:text-rose-600"
                       >
-                        Remove
+                        {t("todoRemove")}
                       </button>
                     </div>
                   ))}
@@ -344,7 +346,7 @@ export const TodoList = () => {
                       onChange={(event) =>
                         setNewSubtaskTitle(event.target.value)
                       }
-                      placeholder="New subtask"
+                      placeholder={t("todoNewSubtaskPlaceholder")}
                       className="flex-1 px-3 py-2 rounded-lg border text-sm outline-none theme-input theme-placeholder"
                     />
                     <button
@@ -352,7 +354,7 @@ export const TodoList = () => {
                       onClick={handleAddSubtask}
                       className="px-3 py-2 rounded-lg bg-[var(--ghost-bg)] hover:bg-[var(--ghost-hover)] text-xs text-[var(--text-primary)]"
                     >
-                      Add
+                      {t("todoAdd")}
                     </button>
                   </div>
                 </div>
@@ -365,14 +367,14 @@ export const TodoList = () => {
                 onClick={closeEditor}
                 className="px-4 py-2 text-xs theme-muted hover:text-[var(--text-primary)]"
               >
-                Cancel
+                {t("todoCancel")}
               </button>
               <button
                 type="submit"
                 disabled={isSubmitting}
                 className="px-5 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 text-xs font-semibold text-white"
               >
-                {isSubmitting ? "Saving..." : "Save changes"}
+                {isSubmitting ? t("todoSaving") : t("todoSaveChanges")}
               </button>
             </div>
           </form>
@@ -382,7 +384,8 @@ export const TodoList = () => {
       {data && data.totalPages > 1 && (
         <div className="flex items-center justify-between text-xs theme-muted pt-2">
           <span>
-            Page {data.page} of {data.totalPages}
+            {t("todoPageLabel")} {data.page} {t("todoOfLabel")}{" "}
+            {data.totalPages}
           </span>
           <div className="flex gap-2">
             <button
@@ -390,7 +393,7 @@ export const TodoList = () => {
               disabled={data.page <= 1}
               onClick={() => dispatch(setPage(Math.max(1, data.page - 1)))}
             >
-              Prev
+              {t("todoPrev")}
             </button>
             <button
               className="px-3 py-1 rounded-lg bg-[var(--ghost-bg)] hover:bg-[var(--ghost-hover)] transition"
@@ -399,7 +402,7 @@ export const TodoList = () => {
                 dispatch(setPage(Math.min(data.totalPages, data.page + 1)))
               }
             >
-              Next
+              {t("todoNext")}
             </button>
           </div>
         </div>

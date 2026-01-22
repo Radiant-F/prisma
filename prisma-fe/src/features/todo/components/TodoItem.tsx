@@ -7,6 +7,7 @@ import {
   MdEdit,
 } from "react-icons/md";
 import type { Todo } from "../todo";
+import { useI18n } from "@/i18n";
 
 interface TodoItemProps {
   todo: Todo;
@@ -25,6 +26,7 @@ export const TodoItem = ({
   onEdit,
   onDelete,
 }: TodoItemProps) => {
+  const { t } = useI18n();
   const completed = todo.completed;
   const important = todo.importance >= 4;
   const dueDate = todo.dueDate
@@ -143,14 +145,14 @@ export const TodoItem = ({
       <div className="absolute top-4 right-12 flex gap-1 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0">
         <button
           className="p-1.5 text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--ghost-hover)] rounded-lg transition-colors"
-          title="Edit"
+          title={t("todoEdit")}
           onClick={() => onEdit(todo)}
         >
           <MdEdit size={16} />
         </button>
         <button
           className="p-1.5 text-[var(--text-muted)] hover:text-rose-500 hover:bg-rose-400/10 rounded-lg transition-colors"
-          title="Delete"
+          title={t("todoDelete")}
           onClick={() => onDelete(todo)}
         >
           <MdDeleteOutline size={16} />

@@ -1,16 +1,18 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import { MdSearch, MdNotificationsNone, MdMenu } from "react-icons/md";
 import { useAppDispatch, useAppSelector } from "@/hooks";
 import { useLogoutMutation } from "@/features/auth/services/authApiSlice";
 import { logout } from "@/features/auth/services/authReducer";
 import { setSearch } from "@/features/todo/services/todoState";
+import { useI18n } from "@/i18n";
 
 interface TodoHeaderProps {
   onMenuClick?: () => void;
 }
 
 export const TodoHeader = ({ onMenuClick }: TodoHeaderProps) => {
+  const { t, language } = useI18n();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.auth.user);
@@ -33,7 +35,16 @@ export const TodoHeader = ({ onMenuClick }: TodoHeaderProps) => {
         .map((part) => part[0]?.toUpperCase())
         .slice(0, 2)
         .join("")
-    : "ME";
+    : t("homeInitialsFallback");
+
+  const dateLabel = useMemo(() => {
+    const locale = language === "id" ? "id-ID" : "en-US";
+    return new Date().toLocaleDateString(locale, {
+      weekday: "long",
+      month: "long",
+      day: "numeric",
+    });
+  }, [language]);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -55,9 +66,10 @@ export const TodoHeader = ({ onMenuClick }: TodoHeaderProps) => {
         </button>
         <div>
           <h1 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight">
-            Good Morning, {user?.username ?? "there"}
+            {t("homeGreeting")},{" "}
+            {user?.username ?? t("homeGreetingFallbackName")}
           </h1>
-          <p className="text-sm theme-muted">Tuesday, January 13</p>
+          <p className="text-sm theme-muted">{dateLabel}</p>
         </div>
       </div>
 
@@ -67,7 +79,7 @@ export const TodoHeader = ({ onMenuClick }: TodoHeaderProps) => {
           <MdSearch size={20} className="theme-muted" />
           <input
             type="text"
-            placeholder="Search tasks..."
+            placeholder={t("homeSearchPlaceholder")}
             value={search}
             onChange={(event) => setSearchValue(event.target.value)}
             className="bg-transparent border-none outline-none text-sm text-[var(--text-primary)] theme-placeholder ml-2 w-full"
@@ -85,7 +97,9 @@ export const TodoHeader = ({ onMenuClick }: TodoHeaderProps) => {
             disabled={logoutState.isLoading}
             className="hidden sm:inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold bg-[var(--ghost-bg)] hover:bg-[var(--ghost-hover)] border border-[var(--ghost-border)] rounded-xl text-[var(--text-primary)] transition-all disabled:opacity-60"
           >
-            {logoutState.isLoading ? "Signing out..." : "Sign out"}
+            {logoutState.isLoading
+              ? t("sidebarSigningOut")
+              : t("sidebarSignOut")}
           </button>
           <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-500 p-0.5 cursor-pointer hover:scale-105 transition-transform">
             <div className="w-full h-full bg-[var(--surface-strong)] rounded-[10px] flex items-center justify-center">

@@ -18,6 +18,16 @@ export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <head>
+        <title>Prisma</title>
+        <meta
+          property="og:image"
+          content="https://github.com/Radiant-F/prisma/blob/main/prisma-fe/public/logo.jpg?raw=true"
+        />
+        <meta property="og:title" content="Prisma" />
+        <meta property="og:description" content="Le epic instruction" />
+        <meta property="og:url" content="https://prisma-fe-ssr.onrender.com" />
+        <meta property="og:type" content="website" />
+        <link rel="icon" href="/logo.jpg" />
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
