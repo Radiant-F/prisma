@@ -30,7 +30,7 @@ services:
       - key: REFRESH_TOKEN_EXPIRES_IN
         value: 7d
   - type: web
-    name: prisma-fe
+    name: prisma-fe-ssr
     env: node
     plan: free
     rootDir: prisma-fe
