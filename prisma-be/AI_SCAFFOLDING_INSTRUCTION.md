@@ -19,141 +19,52 @@ Follow ALL instructions carefully and do not skip steps or take shortcuts.
 | API Docs        | `@elysiajs/openapi` (OpenAPI 3.1 / Scalar UI)      |
 | Client/Testing  | `@elysiajs/eden` (Eden Treaty)                     |
 | Authentication  | `@elysiajs/jwt` (access + refresh token in cookie) |
-| Testing         | `bun: test`                                        |
+| Testing         | `bun:test`                                         |
 | Linting         | ESLint + TypeScript                                |
 | Package Manager | Bun ONLY (`bun add` / `bun add -d`)                |
 
 ---
 
-## KEY ELYSIAJS CONCEPTS
+## KEY PATTERNS
 
-Before scaffolding, understand these core ElysiaJS principles:
+> For detailed explanations, refer to the official documentation in REFERENCES section.
 
-### Handler & Context
+**Critical patterns to follow:**
 
-Handlers receive a `Context` object containing request data and utilities:
-
-```typescript
-app.get("/user/:id", ({ params, query, headers, cookie, store }) => {
-  return { id: params.id };
-});
-```
-
-### Lifecycle Hooks
-
-ElysiaJS provides lifecycle hooks for request processing:
-
-- `onRequest` → `onParse` → `onTransform` → `onBeforeHandle` → **Handler** → `onAfterHandle` → `onMapResponse` → `onAfterResponse`
-- Use `onError` for centralized error handling.
-
-### Plugin Architecture
-
-Use instance-based or functional plugins for modularity and code reuse:
-
-```typescript
-// Instance plugin (recommended for feature modules)
-const userPlugin = new Elysia({ prefix: "/users" })
-  .get("/", () => "list users")
-  .get("/:id", ({ params }) => `user ${params.id}`);
-
-// Functional plugin (for cross-cutting concerns)
-const authPlugin = (app: Elysia) =>
-  app.derive(({ headers }) => ({
-    user: verifyToken(headers.authorization),
-  }));
-```
-
-### Scoping & Encapsulation
-
-- Plugins are **scoped** by default (local state doesn't leak to parent).
-- Use `.scoped()` or `.as('plugin')` to control what propagates.
-- Use `.guard()` to apply shared validation/hooks to grouped routes.
-
-### Validation with TypeBox (Elysia. t)
-
-Use `t` for schema-based validation with automatic type inference:
-
-```typescript
-import { Elysia, t } from "elysia";
-
-app.post("/user", ({ body }) => body, {
-  body: t.Object({
-    username: t.String({ minLength: 3 }),
-    email: t.String({ format: "email" }),
-  }),
-  response: {
-    200: t.Object({ id: t.String(), username: t.String() }),
-    400: t.Object({ message: t.String() }),
-  },
-});
-```
+1. **Use `t.*` (TypeBox)** for all validation—Elysia's type inference depends on it
+2. **Export app type** for Eden Treaty: `export type App = typeof app`
+3. **Use `.derive()`** for request-scoped context, `.decorate()` for app-wide singletons
+4. **Plugins are scoped by default**—use `{ as: 'global' }` in derive/state to propagate
+5. **Keep handlers thin**—delegate business logic to service layer
+6. **DO NOT manually edit `package.json`**—always use `bun add` commands
 
 ---
 
-## REFERENCES & CONTEXT
+## REFERENCES
 
-Refer to these official ElysiaJS resources:
+Consult the official ElysiaJS documentation for implementation details:
 
-### Getting Started
+**Priority reads for this scaffold:**
 
-- [At Glance](https://elysiajs.com/at-glance)
-- [Quick Start](https://elysiajs.com/quick-start)
-- [Key Concept](https://elysiajs.com/key-concept)
+1. [Validation](https://elysiajs.com/essential/validation) – TypeBox patterns
+2. [Plugin](https://elysiajs.com/essential/plugin) – Composition patterns
+3. [Extends Context](https://elysiajs.com/patterns/extends-context) – State, derive, decorate
+4. [JWT Plugin](https://elysiajs.com/plugins/jwt) – Auth implementation
+5. [Eden Treaty Unit Test](https://elysiajs.com/eden/treaty/unit-test) – Testing patterns
+6. [Drizzle Integration](https://elysiajs.com/integrations/drizzle) – Database setup
 
-### Essential
+**Additional resources:**
 
-- [Route](https://elysiajs.com/essential/route) – Path patterns, methods, wildcards
-- [Handler](https://elysiajs.com/essential/handler) – Context object, returning responses
-- [Plugin](https://elysiajs.com/essential/plugin) – Modularity and composition
+- [Route](https://elysiajs.com/essential/route) – Path patterns, methods
+- [Handler](https://elysiajs.com/essential/handler) – Context object
 - [Lifecycle](https://elysiajs.com/essential/life-cycle) – Request lifecycle hooks
-- [Validation](https://elysiajs.com/essential/validation) – Schema validation with TypeBox
-- [Best Practice](https://elysiajs.com/essential/best-practice) – Architecture patterns
-
-### Patterns
-
-- [Configuration](https://elysiajs.com/patterns/configuration) – App configuration
+- [Error Handling](https://elysiajs.com/patterns/error-handling) – Centralized errors
 - [Cookie](https://elysiajs.com/patterns/cookie) – Reactive cookie handling
-- [Error Handling](https://elysiajs. com/patterns/error-handling) – Centralized error handling
-- [Extends Context](https://elysiajs.com/patterns/extends-context) – State, derive, decorate
-- [Macro](https://elysiajs.com/patterns/macro) – Custom route property macros
-- [OpenAPI](https://elysiajs.com/patterns/openapi) – API documentation patterns
-- [Testing](https://elysiajs.com/patterns/unit-test) – Unit testing patterns
-- [TypeBox](https://elysiajs.com/patterns/typebox) – Advanced schema patterns
-- [TypeScript](https://elysiajs.com/patterns/typescript) – Type inference and safety
-
-### Eden (End-to-End Type Safety)
-
-- [Overview](https://elysiajs.com/eden/overview) – Eden introduction
-- [Treaty Overview](https://elysiajs.com/eden/treaty/overview) – Treaty client
-- [Parameters](https://elysiajs.com/eden/treaty/parameters) – Path/query params
-- [Response](https://elysiajs.com/eden/treaty/response) – Response handling
-- [Unit Test](https://elysiajs.com/eden/treaty/unit-test) – Testing with Treaty
-- [Config](https://elysiajs.com/eden/treaty/config) – Treaty configuration
-
-### Plugins
-
-- [JWT Plugin](https://elysiajs.com/plugins/jwt) – JWT authentication
-- [Bearer Plugin](https://elysiajs.com/plugins/bearer) – Bearer token extraction
-- [OpenAPI Plugin](https://elysiajs. com/plugins/openapi) – API documentation
-- [CORS Plugin](https://elysiajs. com/plugins/cors) – CORS configuration
-
-### Integrations
-
-- [Drizzle Integration](https://elysiajs.com/integrations/drizzle) – Drizzle ORM setup
+- [OpenAPI](https://elysiajs.com/patterns/openapi) – API documentation
 
 ---
 
-## IMPORTANT RULES
-
-1. **DO NOT manually edit `package.json`** to add dependencies. Always use `bun add` commands.
-2. **Use `t.*` (TypeBox)** for all validation schemas—not Zod or other libraries.
-3. **Export app type** for Eden Treaty type inference: `export type App = typeof app`
-4. **Prefer composition over inheritance** – use plugins and `.use()` extensively.
-5. **Keep handlers thin** – delegate business logic to service layer.
-
----
-
-## PROJECT ASSUMPTIONS & BOUNDARIES
+## PROJECT ASSUMPTIONS
 
 The user has already:
 
@@ -169,31 +80,7 @@ The app must:
 
 ---
 
-## ENVIRONMENT CONFIGURATION
-
-Create a `.env.example` file with:
-
-```env
-# Database
-DATABASE_URL=postgresql://user:password@localhost: 5432/mydb
-
-# JWT Secrets (generate with:  openssl rand -base64 32)
-JWT_ACCESS_SECRET=your-access-secret-here
-JWT_REFRESH_SECRET=your-refresh-secret-here
-
-# Token Expiration
-ACCESS_TOKEN_EXPIRES_IN=15m
-REFRESH_TOKEN_EXPIRES_IN=7d
-```
-
-- Never commit real secrets.
-- The app reads from `.env` using Bun's built-in env support.
-
----
-
 ## FOLDER STRUCTURE
-
-Design a scalable, feature-isolated structure:
 
 ```
 project-root/
@@ -202,20 +89,21 @@ project-root/
 │   ├── server.ts             # Bootstrap / listen
 │   │
 │   ├── modules/
-│   │   ├── user/
-│   │   │   ├── user.routes.ts      # Elysia plugin with routes
-│   │   │   ├── user.service.ts     # Business logic
-│   │   │   ├── user.schema.ts      # TypeBox schemas (request/response)
-│   │   │   ├── user.repository.ts  # Database operations
-│   │   │   └── user.test.ts        # Unit tests
+│   │   ├── auth/
+│   │   │   ├── auth.routes.ts
+│   │   │   ├── auth.service.ts
+│   │   │   ├── auth.schema.ts
+│   │   │   ├── auth.repository.ts
+│   │   │   ├── auth.guard.ts
+│   │   │   ├── jwt.plugin.ts
+│   │   │   └── auth.test.ts
 │   │   │
-│   │   └── auth/
-│   │       ├── auth.routes. ts
-│   │       ├── auth.service.ts
-│   │       ├── auth.schema.ts
-│   │       ├── auth.guard.ts       # beforeHandle guard
-│   │       ├── jwt.plugin.ts       # JWT plugin configuration
-│   │       └── auth.test.ts
+│   │   └── user/
+│   │       ├── user.routes.ts
+│   │       ├── user.service.ts
+│   │       ├── user.schema.ts
+│   │       ├── user.repository.ts
+│   │       └── user.test.ts
 │   │
 │   ├── db/
 │   │   ├── index.ts          # Drizzle client instance
@@ -232,32 +120,66 @@ project-root/
 │   └── plugins/
 │       └── error-handler.ts  # Global error handler plugin
 │
-├── tests/                    # Integration tests (if not colocated)
-├── docs/                     # Additional documentation
-├── scripts/                  # Utility scripts
-├── drizzle. config.ts         # Drizzle configuration
-├── . env.example
-├── .env                      # Local (gitignored)
+├── drizzle.config.ts
+├── .env.example
 ├── tsconfig.json
 ├── eslint.config.js
 └── package.json
 ```
 
-### Structure Principles
+**Structure Principles:**
 
-1. **Feature-based modules** – Each module is self-contained with routes, services, schemas.
-2. **Routes as plugins** – Export Elysia instances from route files.
-3. **Colocated tests** – Tests live next to the code they test.
-4. **Shared plugins** – Cross-cutting concerns in `/plugins`.
-5. **Database layer** – Drizzle schema, migrations, and client isolated in `/db`.
+1. **Feature-based modules** – Each module is self-contained
+2. **Routes as plugins** – Export Elysia instances from route files
+3. **Colocated tests** – Tests live next to the code they test
+4. **Repository pattern** – Database operations isolated from business logic
 
 ---
 
-## DATABASE & MIGRATIONS (DRIZZLE ORM)
+## ENVIRONMENT CONFIGURATION
 
-### Schema Definition
+### .env.example
 
-Define the users table in `src/db/schema/users.ts`:
+```env
+# Database
+DATABASE_URL=postgresql://user:password@localhost:5432/mydb
+
+# JWT Secrets (generate with: openssl rand -base64 32)
+JWT_ACCESS_SECRET=your-access-secret-here
+JWT_REFRESH_SECRET=your-refresh-secret-here
+
+# Token Expiration
+ACCESS_TOKEN_EXPIRES_IN=15m
+REFRESH_TOKEN_EXPIRES_IN=7d
+```
+
+### Environment Validation (src/lib/env.ts)
+
+```typescript
+function getEnvVar(key: string, defaultValue?: string): string {
+  const value = process.env[key] ?? defaultValue;
+  if (value === undefined) {
+    throw new Error(`Missing required environment variable: ${key}`);
+  }
+  return value;
+}
+
+export const env = {
+  DATABASE_URL: getEnvVar("DATABASE_URL"),
+  JWT_ACCESS_SECRET: getEnvVar("JWT_ACCESS_SECRET"),
+  JWT_REFRESH_SECRET: getEnvVar("JWT_REFRESH_SECRET"),
+  ACCESS_TOKEN_EXPIRES_IN: getEnvVar("ACCESS_TOKEN_EXPIRES_IN", "15m"),
+  REFRESH_TOKEN_EXPIRES_IN: getEnvVar("REFRESH_TOKEN_EXPIRES_IN", "7d"),
+  PORT: parseInt(getEnvVar("PORT", "3000"), 10),
+  NODE_ENV: getEnvVar("NODE_ENV", "development"),
+} as const;
+```
+
+---
+
+## DATABASE SETUP (DRIZZLE ORM)
+
+### Schema Definition (src/db/schema/users.ts)
 
 ```typescript
 import { pgTable, text, integer, timestamp, uuid } from "drizzle-orm/pg-core";
@@ -279,9 +201,19 @@ export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 ```
 
-### Migration Commands
+### Drizzle Client (src/db/index.ts)
 
-Configure `drizzle. config.ts`:
+```typescript
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
+import { env } from "../lib/env";
+import * as schema from "./schema";
+
+const client = postgres(env.DATABASE_URL);
+export const db = drizzle(client, { schema });
+```
+
+### drizzle.config.ts
 
 ```typescript
 import { defineConfig } from "drizzle-kit";
@@ -296,39 +228,109 @@ export default defineConfig({
 });
 ```
 
-Add npm scripts:
+---
 
-```json
-{
-  "scripts": {
-    "db: generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate",
-    "db:studio": "drizzle-kit studio",
-    "db: seed": "bun run src/db/seed. ts"
-  }
-}
-```
+## SCHEMA PATTERN (Single Source of Truth)
 
-### Seed Script
-
-Create `src/db/seed.ts` for development:
+All schemas should follow this pattern with OpenAPI metadata:
 
 ```typescript
-import { db } from "./index";
-import { users } from "./schema";
+// src/modules/{feature}/{feature}.schema.ts
+import { t } from "elysia";
 
-async function seed() {
-  console.log("🌱 Seeding database...");
-  // Add seed data here
-  console.log("✅ Seeding complete");
-}
+// Reusable error response
+export const errorResponse = t.Object({
+  message: t.String({ examples: ["Error description"] }),
+});
 
-seed().catch(console.error);
+// Request schemas with validation + examples
+export const createUserBody = t.Object({
+  username: t.String({
+    minLength: 3,
+    maxLength: 32,
+    examples: ["johndoe"],
+  }),
+  password: t.String({
+    minLength: 8,
+    maxLength: 128,
+    examples: ["securepass123"],
+  }),
+});
+
+// Response schemas with examples
+export const userResponse = t.Object({
+  id: t.String({ examples: ["550e8400-e29b-41d4-a716-446655440000"] }),
+  username: t.String({ examples: ["johndoe"] }),
+});
+
+export const authResponse = t.Object({
+  accessToken: t.String({ examples: ["eyJhbGciOiJIUzI1NiIs..."] }),
+  user: userResponse,
+});
 ```
 
 ---
 
-## AUTHENTICATION MODEL (HYBRID JWT)
+## REPOSITORY PATTERN
+
+```typescript
+// src/modules/user/user.repository.ts
+import { eq, sql } from "drizzle-orm";
+import { db } from "../../db";
+import { users, type User, type NewUser } from "../../db/schema";
+
+export const userRepository = {
+  async findById(id: string): Promise<User | undefined> {
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.id, id))
+      .limit(1);
+    return user;
+  },
+
+  async findByUsername(username: string): Promise<User | undefined> {
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.username, username))
+      .limit(1);
+    return user;
+  },
+
+  async create(data: NewUser): Promise<User> {
+    const [user] = await db.insert(users).values(data).returning();
+    return user;
+  },
+
+  async update(id: string, data: Partial<NewUser>): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(users.id, id))
+      .returning();
+    return user;
+  },
+
+  async delete(id: string): Promise<void> {
+    await db.delete(users).where(eq(users.id, id));
+  },
+
+  async incrementTokenVersion(id: string): Promise<void> {
+    await db
+      .update(users)
+      .set({
+        tokenVersion: sql`${users.tokenVersion} + 1`,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, id));
+  },
+};
+```
+
+---
+
+## AUTHENTICATION MODEL
 
 ### Token Strategy
 
@@ -337,17 +339,11 @@ seed().catch(console.error);
 | Access Token  | 15 min   | Authorization header    | API authentication |
 | Refresh Token | 7 days   | HTTP-only secure cookie | Token renewal      |
 
-### Token Version for Global Invalidation
+**Token Version:** Store `tokenVersion` in users table. Include in JWT payload. Compare on verification. Increment on logout to invalidate all tokens.
 
-- Store `token_version` in the users table.
-- Include `tokenVersion` claim in JWT payload.
-- On verification, compare JWT claim with DB value.
-- On logout, increment `token_version` to invalidate all existing tokens.
-
-### JWT Plugin Configuration
+### JWT Plugin (src/modules/auth/jwt.plugin.ts)
 
 ```typescript
-// src/modules/auth/jwt.plugin.ts
 import { Elysia } from "elysia";
 import { jwt } from "@elysiajs/jwt";
 import { env } from "../../lib/env";
@@ -357,22 +353,19 @@ export const jwtPlugin = new Elysia({ name: "jwt" })
     jwt({
       name: "accessJwt",
       secret: env.JWT_ACCESS_SECRET,
-      exp: env.ACCESS_TOKEN_EXPIRES_IN,
     }),
   )
   .use(
     jwt({
       name: "refreshJwt",
       secret: env.JWT_REFRESH_SECRET,
-      exp: env.REFRESH_TOKEN_EXPIRES_IN,
     }),
   );
 ```
 
-### Auth Guard (beforeHandle)
+### Auth Guard (src/modules/auth/auth.guard.ts)
 
 ```typescript
-// src/modules/auth/auth.guard.ts
 import { Elysia } from "elysia";
 import { jwtPlugin } from "./jwt.plugin";
 import { db } from "../../db";
@@ -381,115 +374,105 @@ import { eq } from "drizzle-orm";
 
 export const authGuard = new Elysia({ name: "authGuard" })
   .use(jwtPlugin)
-  .derive(async ({ accessJwt, headers, error }) => {
+  .derive({ as: "global" }, async ({ accessJwt, headers, set }) => {
     const authorization = headers.authorization;
+
     if (!authorization?.startsWith("Bearer ")) {
-      throw error(401, { message: "Missing authorization header" });
+      set.status = 401;
+      throw new Error("Missing authorization header");
     }
 
     const token = authorization.slice(7);
     const payload = await accessJwt.verify(token);
 
-    if (!payload) {
-      throw error(401, { message: "Invalid or expired token" });
+    if (!payload || typeof payload === "boolean") {
+      set.status = 401;
+      throw new Error("Invalid or expired token");
     }
 
-    // Verify token version matches DB
+    const sub = payload.sub as string;
+    const tokenVersion = payload.tokenVersion as number;
+
     const [user] = await db
       .select()
       .from(users)
-      .where(eq(users.id, payload.sub as string))
+      .where(eq(users.id, sub))
       .limit(1);
 
-    if (!user || user.tokenVersion !== payload.tokenVersion) {
-      throw error(401, { message: "Token revoked" });
+    if (!user || user.tokenVersion !== tokenVersion) {
+      set.status = 401;
+      throw new Error("Token revoked");
     }
 
-    return { user };
+    return {
+      user: {
+        id: user.id,
+        username: user.username,
+        tokenVersion: user.tokenVersion,
+      },
+    };
   });
 ```
 
 ---
 
-## FEATURE: AUTH & USER CRUD
+## API ENDPOINTS
 
-### Endpoints
+| Method | Path            | Auth     | Description           |
+| ------ | --------------- | -------- | --------------------- |
+| POST   | `/auth/signup`  | Public   | Register new user     |
+| POST   | `/auth/signin`  | Public   | Login, issue tokens   |
+| POST   | `/auth/refresh` | Cookie   | Refresh access token  |
+| POST   | `/auth/logout`  | Required | Invalidate all tokens |
+| GET    | `/users/me`     | Required | Get current user      |
+| PUT    | `/users/me`     | Required | Update current user   |
+| DELETE | `/users/me`     | Required | Delete current user   |
+| GET    | `/health`       | Public   | Health check          |
 
-| Method | Path            | Auth     | Description                 |
-| ------ | --------------- | -------- | --------------------------- |
-| POST   | `/auth/signup`  | Public   | Register new user           |
-| POST   | `/auth/signin`  | Public   | Login, issue tokens         |
-| POST   | `/auth/refresh` | Cookie   | Refresh access token        |
-| POST   | `/auth/logout`  | Required | Invalidate all tokens       |
-| GET    | `/users/me`     | Required | Get current user profile    |
-| PUT    | `/users/me`     | Required | Update current user profile |
-| DELETE | `/users/me`     | Required | Delete current user account |
+---
 
-### Schema Definitions
-
-```typescript
-// src/modules/auth/auth.schema.ts
-import { t } from "elysia";
-
-export const signupBody = t.Object({
-  username: t.String({ minLength: 3, maxLength: 32 }),
-  password: t.String({ minLength: 8, maxLength: 128 }),
-});
-
-export const signinBody = t.Object({
-  username: t.String(),
-  password: t.String(),
-});
-
-export const authResponse = t.Object({
-  accessToken: t.String(),
-  user: t.Object({
-    id: t.String(),
-    username: t.String(),
-  }),
-});
-
-export const errorResponse = t.Object({
-  message: t.String(),
-});
-```
-
-### Route Implementation Pattern
+## ROUTE IMPLEMENTATION PATTERN
 
 ```typescript
 // src/modules/auth/auth.routes.ts
 import { Elysia } from "elysia";
-import {
-  signupBody,
-  signinBody,
-  authResponse,
-  errorResponse,
-} from "./auth.schema";
-import { authService } from "./auth. service";
+import { signupBody, authResponse, errorResponse } from "./auth.schema";
+import { authService } from "./auth.service";
 import { jwtPlugin } from "./jwt.plugin";
 
 export const authRoutes = new Elysia({ prefix: "/auth" }).use(jwtPlugin).post(
   "/signup",
-  async ({ body, accessJwt, refreshJwt, cookie }) => {
-    const result = await authService.signup(body);
-    const accessToken = await accessJwt.sign({
-      sub: result.user.id,
-      tokenVersion: result.user.tokenVersion,
-    });
-    const refreshToken = await refreshJwt.sign({
-      sub: result.user.id,
-      tokenVersion: result.user.tokenVersion,
-    });
+  async ({ body, accessJwt, refreshJwt, cookie, set }) => {
+    try {
+      const result = await authService.signup(body);
 
-    cookie.refreshToken.set({
-      value: refreshToken,
-      httpOnly: true,
-      secure: true,
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60, // 7 days
-    });
+      const accessToken = await accessJwt.sign({
+        sub: result.user.id,
+        tokenVersion: result.user.tokenVersion,
+      });
 
-    return { accessToken, user: result.user };
+      const refreshToken = await refreshJwt.sign({
+        sub: result.user.id,
+        tokenVersion: result.user.tokenVersion,
+      });
+
+      cookie.refreshToken.set({
+        value: refreshToken,
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 7 * 24 * 60 * 60,
+        path: "/",
+      });
+
+      return { accessToken, user: result.user };
+    } catch (err) {
+      if (err instanceof ConflictError) {
+        set.status = 409;
+        return { message: err.message };
+      }
+      throw err;
+    }
   },
   {
     body: signupBody,
@@ -505,14 +488,11 @@ export const authRoutes = new Elysia({ prefix: "/auth" }).use(jwtPlugin).post(
     },
   },
 );
-// ... other routes
 ```
 
 ---
 
 ## API DOCUMENTATION (OpenAPI)
-
-### Setup
 
 ```typescript
 import { Elysia } from "elysia";
@@ -545,165 +525,129 @@ const app = new Elysia().use(
 );
 ```
 
-### Route Documentation Requirements
+**Every route MUST include:**
 
-Every route MUST include:
-
-- `detail. summary` – Short description
-- `detail.description` – Detailed explanation
+- `detail.summary` – Short description
 - `detail.tags` – Category grouping
-- `body` schema with examples
+- `body` schema with `examples`
 - `response` schemas for all status codes
-
-```typescript
-. post('/example', handler, {
-  body:  t.Object({
-    name: t.String({ examples: ['John Doe'] })
-  }),
-  response: {
-    200: t.Object({
-      id:  t.String({ examples: ['550e8400-e29b-41d4-a716-446655440000'] }),
-      name: t.String({ examples: ['John Doe'] })
-    }),
-    400: errorResponse
-  },
-  detail: {
-    summary: 'Create example',
-    description:  'Creates a new example resource',
-    tags:  ['Examples'],
-    security: [{ bearerAuth: [] }]
-  }
-})
-```
+- `detail.security` for protected routes
 
 ---
 
 ## TESTING WITH EDEN TREATY
 
-### Testing Pattern (No Network Overhead)
+### Important: Eden Treaty Parameter Structure
 
-Use Eden Treaty with direct instance passing for unit tests:
+When calling API methods with Eden Treaty, use the correct parameter pattern:
 
 ```typescript
-// src/modules/user/user.test.ts
-import { describe, expect, it, beforeAll, afterAll } from "bun:test";
+// GET/HEAD with headers
+api.users.me.get({
+  headers: { authorization: `Bearer ${token}` },
+});
+
+// POST/PUT/DELETE with body AND headers (two arguments)
+api.auth.signup.post(
+  { username: "john", password: "secret123" }, // body (first arg)
+  { headers: { authorization: `Bearer ${token}` } }, // options (second arg)
+);
+
+// POST/DELETE with headers but NO body - pass empty object as body
+api.auth.logout.post(
+  {}, // empty body (required first arg)
+  { headers: { authorization: `Bearer ${token}` } },
+);
+```
+
+### Important: Validation Error Status Code
+
+ElysiaJS returns **422 Unprocessable Entity** for validation errors (not 400):
+
+```typescript
+it("should return 422 for invalid data", async () => {
+  const { error } = await api.auth.signup.post({
+    username: "ab", // too short, fails minLength: 3
+    password: "short",
+  });
+  expect(error?.status).toBe(422); // NOT 400
+});
+```
+
+### Test Example
+
+```typescript
+// src/modules/auth/auth.test.ts
+import { describe, expect, it } from "bun:test";
 import { treaty } from "@elysiajs/eden";
 import { app } from "../../index";
 
 const api = treaty(app);
 
-describe("User Module", () => {
-  describe("GET /users/me", () => {
-    it("should return 401 without auth token", async () => {
-      const { error } = await api.users.me.get();
+describe("Auth Module", () => {
+  const testUser = {
+    username: `testuser_${Date.now()}`,
+    password: "securePassword123",
+  };
 
-      expect(error).not.toBeNull();
-      expect(error?.status).toBe(401);
-    });
-
-    it("should return user profile with valid token", async () => {
-      const { data, error } = await api.users.me.get({
-        headers: {
-          authorization: `Bearer ${validToken}`,
-        },
-      });
+  describe("POST /auth/signup", () => {
+    it("should register a new user with valid data", async () => {
+      const { data, error } = await api.auth.signup.post(testUser);
 
       expect(error).toBeNull();
-      expect(data).toMatchObject({
-        id: expect.any(String),
-        username: expect.any(String),
+      expect(data?.accessToken).toBeDefined();
+      expect(data?.user.username).toBe(testUser.username);
+    });
+
+    it("should return 409 for duplicate username", async () => {
+      const { error } = await api.auth.signup.post(testUser);
+      expect(error?.status).toBe(409);
+    });
+
+    it("should return 422 for validation error", async () => {
+      const { error } = await api.auth.signup.post({
+        username: "ab",
+        password: "short",
       });
+      expect(error?.status).toBe(422);
     });
   });
 });
 ```
 
-### Response Handling Pattern
+### Test Coverage Checklist
 
-Eden Treaty returns `{ data, error, response, status, headers }`:
+**Auth Module:**
 
-```typescript
-const { data, error } = await api.auth.signup.post({
-  username: "testuser",
-  password: "password123",
-});
+- [ ] Signup: valid data → 200 + tokens
+- [ ] Signup: duplicate username → 409
+- [ ] Signup: invalid data → 422 (validation error)
+- [ ] Signin: valid credentials → 200 + tokens
+- [ ] Signin: wrong password → 401
+- [ ] Signin: non-existent user → 401
+- [ ] Refresh: valid cookie → 200 + new token
+- [ ] Refresh: invalid cookie → 401
+- [ ] Logout: valid token → 200 + invalidates sessions
 
-if (error) {
-  // error is narrowed based on response schema
-  switch (error.status) {
-    case 400:
-      console.log("Validation error:", error.value.message);
-      break;
-    case 409:
-      console.log("User exists:", error.value.message);
-      break;
-  }
-} else {
-  // data is fully typed
-  console.log("User created:", data.user.id);
-}
-```
+**Protected Routes:**
 
-### Test Coverage Requirements
+- [ ] No token → 401
+- [ ] Invalid token → 401
+- [ ] Revoked token (after logout) → 401
+- [ ] Valid token → 200
 
-Test ALL endpoints including:
+**User Module:**
 
-| Test Case                          | Expected Outcome          |
-| ---------------------------------- | ------------------------- |
-| Signup with valid data             | 200, returns tokens       |
-| Signup with duplicate username     | 409, conflict error       |
-| Signup with invalid data           | 400, validation error     |
-| Signin with valid credentials      | 200, returns tokens       |
-| Signin with wrong password         | 401, unauthorized         |
-| Signin with non-existent user      | 401, unauthorized         |
-| Protected route without token      | 401, missing auth         |
-| Protected route with invalid token | 401, invalid token        |
-| Protected route with revoked token | 401, token revoked        |
-| Token refresh with valid cookie    | 200, new access token     |
-| Token refresh with invalid cookie  | 401, unauthorized         |
-| Get profile with valid token       | 200, returns user         |
-| Update profile with valid token    | 200, returns updated user |
-| Delete account with valid token    | 200, account deleted      |
-
-### Type Safety Check
-
-Run TypeScript checks on test files:
-
-```bash
-tsc --noEmit src/**/*.test.ts
-```
+- [ ] GET /me → returns profile
+- [ ] PUT /me → updates profile
+- [ ] PUT /me: invalid data → 422
+- [ ] DELETE /me → deletes account
 
 ---
 
-## LINTING & TYPE SAFETY
+## CONFIGURATION FILES
 
-### ESLint Configuration
-
-```javascript
-// eslint. config.js
-import eslint from "@eslint/js";
-import tseslint from "typescript-eslint";
-
-export default tseslint.config(
-  eslint.configs.recommended,
-  ...tseslint.configs.strictTypeChecked,
-  {
-    languageOptions: {
-      parserOptions: {
-        project: true,
-        tsconfigRootDir: import.meta.dirname,
-      },
-    },
-    rules: {
-      "@typescript-eslint/explicit-function-return-type": "warn",
-      "@typescript-eslint/no-explicit-any": "error",
-      "@typescript-eslint/strict-boolean-expressions": "error",
-    },
-  },
-);
-```
-
-### TypeScript Configuration
+### tsconfig.json
 
 ```json
 {
@@ -720,13 +664,46 @@ export default tseslint.config(
     "esModuleInterop": true,
     "skipLibCheck": true,
     "outDir": "./dist",
-    "declaration": true
+    "declaration": true,
+    "types": ["bun-types"]
   },
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
 }
 ```
 
-### NPM Scripts
+### eslint.config.js
+
+```javascript
+import eslint from "@eslint/js";
+import tseslint from "typescript-eslint";
+
+export default tseslint.config(
+  eslint.configs.recommended,
+  ...tseslint.configs.strictTypeChecked,
+  {
+    languageOptions: {
+      parserOptions: {
+        project: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+    rules: {
+      "@typescript-eslint/explicit-function-return-type": "warn",
+      "@typescript-eslint/no-explicit-any": "error",
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        { argsIgnorePattern: "^_" },
+      ],
+    },
+  },
+  {
+    ignores: ["node_modules/", "dist/", "src/db/migrations/", "*.config.*"],
+  },
+);
+```
+
+### package.json scripts
 
 ```json
 {
@@ -737,13 +714,19 @@ export default tseslint.config(
     "lint": "eslint src/",
     "typecheck": "tsc --noEmit",
     "test": "bun test",
-    "test: watch": "bun test --watch",
-    "validate": "bun run lint && bun run typecheck && bun test"
+    "test:watch": "bun test --watch",
+    "validate": "bun run lint && bun run typecheck && bun test",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio",
+    "db:seed": "bun run src/db/seed.ts"
   }
 }
 ```
 
-### Final Validation
+---
+
+## FINAL VALIDATION
 
 After scaffolding, run:
 
@@ -751,15 +734,15 @@ After scaffolding, run:
 bun run validate
 ```
 
-This must pass with **zero errors and warnings**.
+This must pass with **zero errors**.
 
 ---
 
-## DOCUMENTATION OUTPUT
+## SETUP.md OUTPUT
 
-Create a `SETUP.md` containing:
+Create a `SETUP.md` with:
 
-````markdown
+```markdown
 # Project Setup
 
 ## Prerequisites
@@ -767,70 +750,38 @@ Create a `SETUP.md` containing:
 - Bun >= 1.0
 - PostgreSQL >= 14
 
-## One-Time Database Setup
+## Database Setup
 
-> ⚠️ The application does NOT auto-create databases or users.
+> ⚠️ The application does NOT auto-create databases.
 
-```bash
-# Create database (run once)
+\`\`\`bash
 createdb myapp_dev
-
-# Or via psql
-psql -c "CREATE DATABASE myapp_dev;"
-```
+\`\`\`
 
 ## Environment Setup
 
-```bash
-# Copy example env file
-cp . env.example .env
+\`\`\`bash
+cp .env.example .env
 
-# Edit with your values
-nano .env
-```
+# Edit .env with your values
 
-## Install Dependencies
+\`\`\`
 
-```bash
+## Install & Run
+
+\`\`\`bash
 bun install
-```
-
-## Database Migrations
-
-```bash
-# Generate migrations from schema changes
 bun run db:generate
-
-# Apply migrations
 bun run db:migrate
-
-# (Optional) Seed development data
-bun run db:seed
-```
-
-## Development
-
-```bash
 bun run dev
-```
+\`\`\`
 
-API available at: http://localhost:3000
-OpenAPI docs at: http://localhost:3000/docs
+- API: http://localhost:3000
+- Docs: http://localhost:3000/docs
 
 ## Testing
 
-```bash
-# Run all tests
+\`\`\`bash
 bun test
-
-# Watch mode
-bun test --watch
+\`\`\`
 ```
-
-## Production Build
-
-```bash
-bun run build
-bun run start
-```
-````
